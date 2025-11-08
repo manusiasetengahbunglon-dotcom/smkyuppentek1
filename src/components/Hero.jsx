@@ -7,7 +7,7 @@ export default function Hero() {
   const [showVideo, setShowVideo] = useState(false);
   const [pos, setPos] = useState({ x: 50, y: 50 });
 
-  // 🔹 Animasi background halus
+  // Animasi background halus
   useEffect(() => {
     let x = 50,
       y = 50,
@@ -25,10 +25,9 @@ export default function Hero() {
 
   return (
     <>
-      {/* 🏫 HERO SECTION */}
       <section
         id="hero"
-        className="relative w-full min-h-screen flex flex-col justify-center items-center overflow-hidden text-center md:text-left md:items-start px-6 md:px-16"
+        className="relative w-full min-h-[80vh] flex flex-col justify-center items-center overflow-hidden text-center md:text-left md:items-start px-6 sm:px-8 md:px-16"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
@@ -40,20 +39,14 @@ export default function Hero() {
         <div className="absolute inset-0 bg-black/60"></div>
 
         {/* Konten utama */}
-        <div
-          className="
-            relative z-10 text-white max-w-3xl animate-fadeIn
-            flex flex-col items-center md:items-start
-            mt-20 md:mt-0
-          "
-        >
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+        <div className="relative z-10 flex flex-col items-center md:items-start mt-10 sm:mt-0 w-full max-w-4xl text-center md:text-left px-2 sm:px-0">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold leading-snug sm:leading-tight md:leading-tight mb-4">
             <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent drop-shadow-lg">
               SMK&nbsp;YUPENTEK&nbsp;1&nbsp;TANGERANG
             </span>
           </h1>
 
-          <p className="text-gray-100/90 text-sm sm:text-base md:text-lg mb-8 leading-relaxed max-w-2xl text-center md:text-left">
+          <p className="text-gray-100/90 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed max-w-full sm:max-w-xl md:max-w-2xl">
             Tempat generasi muda mengasah keterampilan, mengembangkan ide, dan
             menjadi pemimpin masa depan dengan semangat OSIS yang kreatif dan
             kolaboratif.
