@@ -1,23 +1,29 @@
-// src/App.jsx
 import React from "react";
-import { Routes, Route } from "react-router-dom"; 
+import { Routes, Route } from "react-router-dom";
+
+// 🧩 Components utama
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Profile from "./components/Profile";
 import VisiMisi from "./components/VisiMisi";
 import Jurusan from "./components/Jurusan";
 import Galeri from "./components/Galeri";
+import Event from "./components/Event";
+import Kegiatan from "./components/Kegiatan";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+
+// 📄 Pages
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
-import DetailEvent from "./Pages/DetailEvent"; // ✅ sudah diimport
+
+// 🖼️ Background utama
 import bg from "./assets/bg.jpg";
 
 export default function App() {
   return (
     <Routes>
-      {/* 🏠 Halaman Utama (Landing Page) */}
+      {/* 🏠 Halaman Utama */}
       <Route
         path="/"
         element={
@@ -32,10 +38,13 @@ export default function App() {
             }}
           >
             <Navbar />
+
+            {/* 🏫 Hero */}
             <section id="hero" className="relative min-h-screen">
               <Hero />
             </section>
 
+            {/* 👤 Profile */}
             <section
               id="profile"
               className="py-20 bg-gradient-to-b from-blue-50/70 via-white/90 to-blue-100/60 text-gray-900"
@@ -43,6 +52,7 @@ export default function App() {
               <Profile />
             </section>
 
+            {/* 🎯 Visi Misi */}
             <section
               id="visimisi"
               className="py-20 bg-gradient-to-b from-blue-100/80 via-blue-200/60 to-blue-100/70 text-gray-900"
@@ -50,6 +60,7 @@ export default function App() {
               <VisiMisi />
             </section>
 
+            {/* 🧰 Jurusan */}
             <section
               id="jurusan"
               className="py-20 bg-gradient-to-b from-blue-50/70 via-white/90 to-blue-100/70 text-gray-900"
@@ -57,6 +68,7 @@ export default function App() {
               <Jurusan />
             </section>
 
+            {/* 🖼️ Galeri */}
             <section
               id="galeri"
               className="py-20 bg-gradient-to-b from-blue-100/70 via-blue-50/90 to-white/80 text-gray-900"
@@ -64,6 +76,23 @@ export default function App() {
               <Galeri />
             </section>
 
+            {/* 📅 Event */}
+            <section
+              id="event"
+              className="py-20 bg-gradient-to-b from-white/90 via-blue-50/80 to-blue-100/70 text-gray-900"
+            >
+              <Event />
+            </section>
+
+            {/* 🎉 Kegiatan */}
+            <section
+              id="kegiatan"
+              className="py-20 bg-gradient-to-b from-blue-50/70 via-white/90 to-blue-100/60 text-gray-900"
+            >
+              <Kegiatan />
+            </section>
+
+            {/* ☎️ Contact */}
             <section
               id="contact"
               className="py-20 bg-gradient-to-b from-white/90 via-blue-50/80 to-blue-100/70 text-gray-900"
@@ -79,11 +108,8 @@ export default function App() {
       {/* 🔐 Halaman Login */}
       <Route path="/login" element={<Login />} />
 
-      {/* 📊 Dashboard */}
+      {/* 🧭 Dashboard Admin */}
       <Route path="/dashboard" element={<Dashboard />} />
-
-      {/* 📅 Detail Event — ✅ route sudah benar */}
-      <Route path="/detail/:id" element={<DetailEvent />} />
     </Routes>
   );
 }

@@ -1,24 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.jpg";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase"; // pastikan ini ada export auth
 import batik from "../assets/washi.png";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [nis, setNis] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const dummyStudent = { nis: "1234567890", name: "Muhammad Salman Alfarisi" };
-    const correctPassword = dummyStudent.nis.slice(-4);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    if (nis === dummyStudent.nis && password === correctPassword) {
-      navigate("/dashboard", { state: { user: dummyStudent } });
-    } else {
-      setError("❌ NIS atau Password salah!");
+      // ✅ Cek UID admin
+      if (user.uid === "jRAB9eA5ZEVGPRAueBftOnJMc7y1") {
+  localStorage.setItem("isLoggedIn", "true");
+  localStorage.setItem("uid", user.uid);
+  navigate("/dashboard");
+} else {
+  setError("❌ Akses ditolak: akun ini bukan admin.");
+}
+    } catch (err) {
+      console.error(err);
+      setError("Email atau password salah!");
     }
   };
 
@@ -29,20 +39,18 @@ export default function Login() {
         backgroundImage: `url(${batik})`,
       }}
     >
-      {/* Overlay lembut */}
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]"></div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
 
       {/* Card utama */}
       <div className="relative bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-[90%] max-w-md text-center z-10">
-
-        {/* Logo asli */}
+        {/* ✅ Logo ambil dari public */}
         <img
-          src={logo}
+          src="/logo.jpg"
           alt="Logo EMS"
           className="w-20 h-20 mx-auto mb-3 rounded-full shadow-lg"
         />
 
-        {/* Teks gradasi EMS */}
         <h1
           className="text-5xl font-extrabold tracking-widest mb-1"
           style={{
@@ -56,14 +64,7 @@ export default function Login() {
           EMS
         </h1>
 
-        {/* Subjudul elegan */}
-        <h2
-          className="text-sm font-semibold tracking-wide mb-2 text-gray-700"
-          style={{
-            fontFamily: "'Poppins', sans-serif",
-            letterSpacing: "1px",
-          }}
-        >
+        <h2 className="text-sm font-semibold tracking-wide mb-2 text-gray-700">
           Event Management System
         </h2>
 
@@ -71,21 +72,22 @@ export default function Login() {
           SMK YUPENTEK 1 TANGERANG
         </p>
 
-        {/* Form Login */}
         <form onSubmit={handleLogin}>
           <input
-            type="text"
-            placeholder="Masukkan NIS"
-            value={nis}
-            onChange={(e) => setNis(e.target.value)}
+            type="email"
+            placeholder="Masukkan Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-all"
+            required
           />
           <input
             type="password"
-            placeholder="Password (4 digit belakang)"
+            placeholder="Masukkan Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:ring-2 focus:ring-indigo-400 focus:outline-none transition-all"
+            required
           />
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}

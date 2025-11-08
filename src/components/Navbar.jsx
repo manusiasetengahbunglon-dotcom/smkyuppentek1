@@ -1,11 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import logo from "../assets/logo.jpg";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const logo = "/logo.jpg"; // pastikan logo ada di public/
+
+  // Semua menu utama (Event & Kegiatan sekarang pakai href agar scroll di halaman yang sama)
+  const menuItems = [
+    { name: "Home", href: "#hero" },
+    { name: "Profile", href: "#profile" },
+    { name: "Visi Misi", href: "#visimisi" },
+    { name: "Jurusan", href: "#jurusan" },
+    { name: "Galeri", href: "#galeri" },
+    { name: "Event", href: "#event" },       // 🔥 ubahan di sini
+    { name: "Kegiatan", href: "#kegiatan" }, // 🔥 ubahan di sini
+    { name: "Contact", href: "#contact" },
+  ];
+
+  const handleNavClick = (item) => {
+    setMenuOpen(false);
+    if (item.href) {
+      const el = document.querySelector(item.href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-black/70 backdrop-blur-sm z-50 shadow-md">
@@ -15,32 +35,23 @@ export default function Navbar() {
           className="flex items-center gap-3 cursor-pointer"
           onClick={() => navigate("/")}
         >
-          <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+          <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
           <h1 className="text-yellow-400 font-bold text-lg">
             SMK YUPENTEK 1 TANGERANG
           </h1>
         </div>
 
-        {/* Menu Navigasi - tampil di desktop */}
+        {/* Menu Navigasi - Desktop */}
         <div className="hidden md:flex gap-6 text-sm text-white">
-          <a href="#hero" className="hover:text-yellow-400 transition-colors">
-            Home
-          </a>
-          <a href="#profile" className="hover:text-yellow-400 transition-colors">
-            Profile
-          </a>
-          <a href="#visimisi" className="hover:text-yellow-400 transition-colors">
-            Visi Misi
-          </a>
-          <a href="#jurusan" className="hover:text-yellow-400 transition-colors">
-            Jurusan
-          </a>
-          <a href="#galeri" className="hover:text-yellow-400 transition-colors">
-            Galeri
-          </a>
-          <a href="#contact" className="hover:text-yellow-400 transition-colors">
-            Contact
-          </a>
+          {menuItems.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => handleNavClick(item)}
+              className="hover:text-yellow-400 transition-colors"
+            >
+              {item.name}
+            </button>
+          ))}
         </div>
 
         {/* Tombol Login - Desktop */}
@@ -51,7 +62,7 @@ export default function Navbar() {
           Login
         </button>
 
-        {/* Tombol titik tiga (burger menu) untuk mobile */}
+        {/* Tombol burger menu untuk mobile */}
         <button
           className="md:hidden text-yellow-400"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -63,50 +74,17 @@ export default function Navbar() {
       {/* Menu dropdown versi mobile */}
       {menuOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-sm text-white text-center py-4 space-y-3 animate-fadeIn">
-          <a
-            href="#hero"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Home
-          </a>
-          <a
-            href="#profile"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Profile
-          </a>
-          <a
-            href="#visimisi"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Visi Misi
-          </a>
-          <a
-            href="#jurusan"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Jurusan
-          </a>
-          <a
-            href="#galeri"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Galeri
-          </a>
-          <a
-            href="#contact"
-            className="block hover:text-yellow-400"
-            onClick={() => setMenuOpen(false)}
-          >
-            Contact
-          </a>
+          {menuItems.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => handleNavClick(item)}
+              className="block w-full hover:text-yellow-400"
+            >
+              {item.name}
+            </button>
+          ))}
 
-          {/* Tombol login di dalam menu mobile */}
+          {/* Tombol login di menu mobile */}
           <button
             onClick={() => {
               setMenuOpen(false);

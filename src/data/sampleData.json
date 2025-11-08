@@ -1,0 +1,30 @@
+{
+  "items": {
+    "template_event_1": {
+      "title": "Judul Event",
+      "description": "Deskripsi lengkap event di sini",
+      "date": "2025-11-20",
+      "location": "Tempat event",
+      "image": "https://via.placeholder.com/600x400?text=Event+Image",
+      "type": "event",
+      "timestamp": 1731056800000
+    },
+    "template_kegiatan_1": {
+      "title": "Judul Kegiatan",
+      "description": "Deskripsi lengkap kegiatan di sini",
+      "date": "2025-11-25",
+      "location": "Tempat kegiatan",
+      "image": "https://via.placeholder.com/600x400?text=Kegiatan+Image",
+      "type": "kegiatan",
+      "timestamp": 1731057000000
+    }
+  },
+  "users": {
+    "jRAB9eA5ZEVGPRAueBftOnJMc7y1": {
+      "email": "smkyuppentek1tgr@gmail.com",
+      "role": "admin",
+      "name": "Administrator OSIS",
+      "createdAt": 1731057100000
+    }
+  }
+}
