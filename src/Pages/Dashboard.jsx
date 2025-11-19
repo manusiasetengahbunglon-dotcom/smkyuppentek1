@@ -168,9 +168,7 @@ export default function Dashboard() {
   // -----------------------------
   // 🔹 SHARE WHATSAPP FIX GAMBAR
   // -----------------------------
-  const shareToWhatsApp = (item) => {
-  const nomorTujuan = "6282128507274";
-
+ const shareToWhatsApp = (item) => {
   const detailUrl = `${window.location.origin}/detail/${item.id}`;
 
   const text = `
@@ -185,7 +183,7 @@ Klik untuk lihat gambar & detail:
 ${detailUrl}
   `;
 
-  const waUrl = `https://api.whatsapp.com/send?phone=${nomorTujuan}&text=${encodeURIComponent(text)}`;
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
 
   window.open(waUrl, "_blank");
 };
