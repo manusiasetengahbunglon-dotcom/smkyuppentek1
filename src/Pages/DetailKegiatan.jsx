@@ -1,13 +1,30 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ref, get } from "firebase/database";
+import { db } from "../firebase";
 
 export default function DetailKegiatan() {
-  const location = useLocation();
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const data = location.state;
+  const [data, setData] = useState(null);
 
-  if (!data) {
+  useEffect(() => {
+    const dbRef = ref(db, `items/${id}`);
+    get(dbRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        setData(snapshot.val());
+      } else {
+        setData("NOT_FOUND");
+      }
+    });
+  }, [id]);
+
+  if (data === null) {
+    return <div className="p-10 text-center">Loading...</div>;
+  }
+
+  if (data === "NOT_FOUND") {
     return (
       <div className="p-10 text-center text-xl text-red-500">
         Data tidak ditemukan!
@@ -36,8 +53,8 @@ export default function DetailKegiatan() {
           alt="Kegiatan"
           className="rounded-xl w-full mb-6 shadow"
         />
-        <h1 className="text-3xl font-bold mb-4">{data.judul}</h1>
-        <p className="text-lg leading-relaxed">{data.deskripsi}</p>
+        <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
+        <p className="text-lg leading-relaxed">{data.description}</p>
       </div>
     </div>
   );
