@@ -169,23 +169,26 @@ export default function Dashboard() {
   // 🔹 SHARE WHATSAPP FIX GAMBAR
   // -----------------------------
   const shareToWhatsApp = (item) => {
-    const nomorTujuan = "6282128507274"; // ganti nomor
+  const nomorTujuan = "6282128507274";
 
-    const detailUrl = `${window.location.origin}/detail/${item.id}`;
+  const detailUrl = `${window.location.origin}/detail/${item.id}`;
 
-    const pesan =
-      `📢 *${item.title}*\n\n` +
-      `🗓️ Tanggal: ${item.date}\n` +
-      `📍 Lokasi: ${item.location}\n\n` +
-      `📝 ${item.description}\n\n` +
-      `Klik untuk lihat gambar & detail:\n${detailUrl}`;
+  const text = `
+📌 *${item.title}*
 
-    const url = `https://wa.me/${nomorTujuan}?text=${encodeURIComponent(
-      pesan
-    )}`;
+📅 Tanggal: ${item.date || "-"}
+📍 Lokasi: ${item.location || "-"}
 
-    window.open(url, "_blank");
-  };
+${item.description}
+
+Klik untuk lihat gambar & detail:
+${detailUrl}
+  `;
+
+  const waUrl = `https://api.whatsapp.com/send?phone=${nomorTujuan}&text=${encodeURIComponent(text)}`;
+
+  window.open(waUrl, "_blank");
+};
 
   // Filter
   const filteredItems =
