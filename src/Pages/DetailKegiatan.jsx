@@ -9,16 +9,19 @@ export default function DetailKegiatan() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
+  // -----------------------------
+  // AMBIL DATA DARI FIREBASE
+  // -----------------------------
   useEffect(() => {
     const dbRef = ref(db, `items/${id}`);
+
     get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           const val = snapshot.val();
-          console.log("Fetched data for detail:", val);
+          console.log("Fetched detail:", val);
           setData(val);
         } else {
-          console.log("No data at this id:", id);
           setError("NOT_FOUND");
         }
       })
@@ -47,25 +50,31 @@ export default function DetailKegiatan() {
   }
 
   if (error === "ERROR") {
-    return <div className="p-10 text-center text-red-500">Terjadi kesalahan saat mengambil data</div>;
+    return (
+      <div className="p-10 text-center text-red-500">
+        Terjadi kesalahan saat mengambil data
+      </div>
+    );
   }
 
   // -----------------------------
   // FIX SHARE WHATSAPP ENCODING
   // -----------------------------
   const text = `
-📌 *${data.judul}*
+📌 *${data.title}*
 
-📅 Tanggal: ${data.tanggal || "-"}
-📍 Lokasi: ${data.lokasi || "-"}
+📅 Tanggal: ${data.date || "-"}
+📍 Lokasi: ${data.location || "-"}
 
-${data.deskripsi}
+${data.description}
 
 Klik untuk lihat gambar & detail:
 https://smkyuppentek1.vercel.app/detail/${id}
   `;
 
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+    text
+  )}`;
 
   // -----------------------------
 
@@ -79,25 +88,28 @@ https://smkyuppentek1.vercel.app/detail/${id}
       </button>
 
       <div className="bg-white p-8 rounded-2xl shadow-md max-w-4xl mx-auto">
-        
         {data.image ? (
           <img
             src={data.image}
             alt="Kegiatan"
             className="rounded-xl w-full mb-6 shadow"
+            onError={(e) => {
+              e.target.src =
+                "https://via.placeholder.com/600x400?text=Gambar+Tidak+Tersedia";
+            }}
           />
         ) : (
           <div className="text-red-500">Gambar tidak tersedia</div>
         )}
 
-        <h1 className="text-3xl font-bold mb-4">{data.judul}</h1>
-        <p className="text-lg leading-relaxed">{data.deskripsi}</p>
+        <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
+        <p className="text-lg leading-relaxed mb-6">{data.description}</p>
 
         <a
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-block px-5 py-3 bg-green-600 text-white rounded-xl shadow"
+          className="mt-6 inline-block px-5 py-3 bg-green-600 text-white rounded-xl shadow hover:bg-green-700"
         >
           Share WhatsApp
         </a>
