@@ -29,6 +29,7 @@ export default function Dashboard() {
     image: "",
     type: "event",
   });
+
   const [editingId, setEditingId] = useState(null);
   const [items, setItems] = useState([]);
   const [toast, setToast] = useState(null);
@@ -54,36 +55,33 @@ export default function Dashboard() {
   }, []);
 
   // Upload gambar ke ImgBB
-  // Upload gambar ke ImgBB (versi aman)
-const uploadImage = async (file) => {
-  try {
-    const form = new FormData();
-    form.append("image", file);
+  const uploadImage = async (file) => {
+    try {
+      const form = new FormData();
+      form.append("image", file);
 
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-      method: "POST",
-      body: form,
-    });
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+        method: "POST",
+        body: form,
+      });
 
-    const data = await res.json();
-    console.log("🔥 ImgBB Response:", data);
+      const data = await res.json();
+      if (!data.success) throw new Error("Upload gagal");
 
-    if (!data.success) throw new Error("Upload gagal");
+      const rawUrl = data.data.image.url;
+      const safeUrl = `https://images.weserv.nl/?url=${encodeURIComponent(
+        rawUrl
+      )}`;
 
-    // 🎯 Langsung pakai proxy aman agar 100% tampil di browser
-    const originalUrl = data.data.image.url;
-    const safeUrl = `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl)}`;
+      return safeUrl;
+    } catch (err) {
+      console.error("Upload gagal:", err);
+      setToast({ message: "❌ Upload gambar gagal!", type: "error" });
+      return "";
+    }
+  };
 
-    return safeUrl;
-
-  } catch (err) {
-    console.error("Upload gagal:", err);
-    setToast({ message: "❌ Upload gambar gagal!", type: "error" });
-    return "";
-  }
-};
-
-
+  // Input handler
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image" && files && files[0]) {
@@ -97,11 +95,14 @@ const uploadImage = async (file) => {
     }
   };
 
+  // Submit data
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
+
     try {
       let imageUrl = formData.image;
+
       if (formData.image instanceof File) {
         imageUrl = await uploadImage(formData.image);
         if (!imageUrl) throw new Error("Upload gagal");
@@ -119,8 +120,8 @@ const uploadImage = async (file) => {
 
       if (editingId) {
         await update(ref(db, `items/${editingId}`), itemData);
-        setEditingId(null);
         setToast({ message: "✅ Data berhasil diupdate!" });
+        setEditingId(null);
       } else {
         const newRef = push(ref(db, "items"));
         await set(newRef, itemData);
@@ -143,6 +144,7 @@ const uploadImage = async (file) => {
     }
   };
 
+  // Edit data
   const handleEdit = (item) => {
     setEditingId(item.id);
     setFormData({
@@ -155,6 +157,7 @@ const uploadImage = async (file) => {
     });
   };
 
+  // Delete data
   const handleDelete = async (id) => {
     if (window.confirm("Yakin ingin menghapus data ini?")) {
       await remove(ref(db, `items/${id}`));
@@ -162,12 +165,35 @@ const uploadImage = async (file) => {
     }
   };
 
-  // Filter items
+  // -----------------------------
+  // 🔹 SHARE WHATSAPP FIX GAMBAR
+  // -----------------------------
+  const shareToWhatsApp = (item) => {
+    const nomorTujuan = "6282128507274"; // ganti nomor
+
+    const detailUrl = `${window.location.origin}/detail/${item.id}`;
+
+    const pesan =
+      `📢 *${item.title}*\n\n` +
+      `🗓️ Tanggal: ${item.date}\n` +
+      `📍 Lokasi: ${item.location}\n\n` +
+      `📝 ${item.description}\n\n` +
+      `Klik untuk lihat gambar & detail:\n${detailUrl}`;
+
+    const url = `https://wa.me/${nomorTujuan}?text=${encodeURIComponent(
+      pesan
+    )}`;
+
+    window.open(url, "_blank");
+  };
+
+  // Filter
   const filteredItems =
-    filter === "all" ? items : items.filter((item) => item.type === filter);
+    filter === "all" ? items : items.filter((i) => i.type === filter);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-blue-50 via-white to-blue-100 font-[Poppins,sans-serif]">
+      
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 bg-[#111827] text-white flex-col shadow-xl">
         <div className="p-6 border-b border-white/10 flex items-center gap-3">
@@ -181,6 +207,7 @@ const uploadImage = async (file) => {
             <p className="text-[11px] text-gray-400">SMK YUPENTEK 1</p>
           </div>
         </div>
+
         <div className="p-6 flex flex-col gap-3">
           <button
             onClick={() => setFilter("all")}
@@ -211,6 +238,8 @@ const uploadImage = async (file) => {
 
       {/* Main */}
       <main className="flex-1 p-5 md:p-10">
+        
+        {/* Form */}
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           {editingId ? "✏️ Edit Data" : "📝 Tambah Data Baru"}
         </h2>
@@ -299,6 +328,7 @@ const uploadImage = async (file) => {
                 onChange={handleChange}
                 className="w-full mt-1 p-2 border rounded-lg"
               />
+
               {formData.image && (
                 <img
                   src={
@@ -323,10 +353,9 @@ const uploadImage = async (file) => {
           </button>
         </form>
 
-        {/* List Data */}
-        <h2 className="text-xl font-bold text-gray-800 mb-3">
-          📋 Data Tersimpan
-        </h2>
+        {/* List */}
+        <h2 className="text-xl font-bold text-gray-800 mb-3">📋 Data Tersimpan</h2>
+
         {filteredItems.length === 0 ? (
           <p className="text-gray-500 italic">Belum ada data</p>
         ) : (
@@ -347,15 +376,18 @@ const uploadImage = async (file) => {
                     className="w-full h-36 object-cover rounded-md mb-3"
                   />
                 )}
+
                 <h3 className="font-semibold text-gray-800">{item.title}</h3>
                 <p className="text-sm text-gray-500 mb-1">{item.date}</p>
                 <p className="text-sm text-gray-500 mb-2">{item.location}</p>
                 <p className="text-xs text-gray-600 line-clamp-3 mb-3">
                   {item.description}
                 </p>
+
                 <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-md w-fit mb-2">
                   {item.type}
                 </span>
+
                 <div className="mt-auto flex gap-2">
                   <button
                     onClick={() => handleEdit(item)}
@@ -363,6 +395,7 @@ const uploadImage = async (file) => {
                   >
                     Edit
                   </button>
+
                   <button
                     onClick={() => handleDelete(item.id)}
                     className="flex-1 bg-red-500 text-sm text-white py-1 rounded-lg hover:bg-red-400 transition"
@@ -370,6 +403,13 @@ const uploadImage = async (file) => {
                     Hapus
                   </button>
                 </div>
+
+                <button
+                  onClick={() => shareToWhatsApp(item)}
+                  className="mt-3 w-full bg-green-500 text-white text-sm py-2 rounded-lg hover:bg-green-600"
+                >
+                  Share ke WhatsApp
+                </button>
               </motion.div>
             ))}
           </div>

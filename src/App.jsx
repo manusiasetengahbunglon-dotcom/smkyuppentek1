@@ -16,6 +16,7 @@ import Footer from "./components/Footer";
 // 📄 Pages
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
+import DetailKegiatan from "./Pages/DetailKegiatan"; // ⬅️ tambahkan ini
 
 // 🖼️ Background utama
 import bg from "./assets/bg.jpg";
@@ -110,6 +111,9 @@ export default function App() {
 
       {/* 🧭 Dashboard Admin */}
       <Route path="/dashboard" element={<Dashboard />} />
+
+      {/* 📄 Detail Kegiatan */}
+      <Route path="/detail/:id" element={<DetailKegiatan />} />
     </Routes>
   );
 }

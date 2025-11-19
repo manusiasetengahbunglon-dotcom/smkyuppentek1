@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://smkyentek1.vercel.app"],
+    "method": ["GET", "POST", "PUT", "HEAD"],
+    "maxAgeSeconds": 3600
+  }
+]
