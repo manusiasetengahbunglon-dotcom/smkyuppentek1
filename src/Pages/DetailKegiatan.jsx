@@ -28,7 +28,7 @@ export default function DetailKegiatan() {
       });
   }, [id]);
 
-  if (error === null && data === null) {
+  if (!data && !error) {
     return <div className="p-10 text-center">Loading...</div>;
   }
 
@@ -36,7 +36,10 @@ export default function DetailKegiatan() {
     return (
       <div className="p-10 text-center text-red-500">
         Data tidak ditemukan!
-        <button onClick={() => navigate("/dashboard")} className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-lg">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
           Kembali
         </button>
       </div>
@@ -47,20 +50,57 @@ export default function DetailKegiatan() {
     return <div className="p-10 text-center text-red-500">Terjadi kesalahan saat mengambil data</div>;
   }
 
+  // -----------------------------
+  // FIX SHARE WHATSAPP ENCODING
+  // -----------------------------
+  const text = `
+📌 *${data.judul}*
+
+📅 Tanggal: ${data.tanggal || "-"}
+📍 Lokasi: ${data.lokasi || "-"}
+
+${data.deskripsi}
+
+Klik untuk lihat gambar & detail:
+https://smkyuppentek1.vercel.app/detail/${id}
+  `;
+
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+  // -----------------------------
+
   return (
     <div className="min-h-screen p-10 bg-gray-100 text-gray-900">
-      <button onClick={() => navigate("/dashboard")} className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-lg">
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="mb-6 px-4 py-2 bg-blue-600 text-white rounded-lg"
+      >
         Kembali
       </button>
 
       <div className="bg-white p-8 rounded-2xl shadow-md max-w-4xl mx-auto">
+        
         {data.image ? (
-          <img src={data.image} alt="Kegiatan" className="rounded-xl w-full mb-6 shadow" />
+          <img
+            src={data.image}
+            alt="Kegiatan"
+            className="rounded-xl w-full mb-6 shadow"
+          />
         ) : (
           <div className="text-red-500">Gambar tidak tersedia</div>
         )}
-        <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
-        <p className="text-lg leading-relaxed">{data.description}</p>
+
+        <h1 className="text-3xl font-bold mb-4">{data.judul}</h1>
+        <p className="text-lg leading-relaxed">{data.deskripsi}</p>
+
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-block px-5 py-3 bg-green-600 text-white rounded-xl shadow"
+        >
+          Share WhatsApp
+        </a>
       </div>
     </div>
   );
