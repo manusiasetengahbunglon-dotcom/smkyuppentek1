@@ -168,7 +168,7 @@ export default function Dashboard() {
   // -----------------------------
   // 🔹 SHARE WHATSAPP FIX GAMBAR
   // -----------------------------
- const shareToWhatsApp = (item) => {
+const shareToWhatsApp = (item) => {
   const detailUrl = `${window.location.origin}/detail/${item.id}`;
 
   const text = `
@@ -187,6 +187,7 @@ ${detailUrl}
 
   window.open(waUrl, "_blank");
 };
+
 
   // Filter
   const filteredItems =
