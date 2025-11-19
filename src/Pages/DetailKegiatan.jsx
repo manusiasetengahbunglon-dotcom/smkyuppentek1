@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ref, get } from "firebase/database";
 import { db } from "../firebase";
-import { Helmet } from "react-helmet"; // ← aman untuk React 19
+import { Helmet } from "react-helmet";
 
 export default function DetailKegiatan() {
   const { id } = useParams();
@@ -12,19 +12,18 @@ export default function DetailKegiatan() {
   const [error, setError] = useState(null);
   const [ogImageUrl, setOgImageUrl] = useState("");
 
-  // Normalizer biar field nama bebas (judul/deskripsi/date dll)
+  // Normalizer data Firebase
   const normalize = (raw) => ({
-    title: raw?.title || raw?.judul || "Kegiatan",
+    title: raw?.title || raw?.judul || "Kegiatan OSIS",
     description: raw?.description || raw?.deskripsi || "-",
     date: raw?.date || raw?.tanggal || "-",
     location: raw?.location || raw?.lokasi || "-",
     image: raw?.image || raw?.img || raw?.imageUrl || "",
   });
 
-  // Ambil data Firebase
+  // Ambil data dari Firebase
   useEffect(() => {
     const dbRef = ref(db, `items/${id}`);
-
     get(dbRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -36,20 +35,23 @@ export default function DetailKegiatan() {
       .catch(() => setError("ERROR"));
   }, [id]);
 
-  // Siapkan URL OG image
+  // Generate OG image API
   useEffect(() => {
     if (!data) return;
     const origin = window.location.origin;
-    const url = `${origin}/api/og?id=${id}&title=${encodeURIComponent(
+    const url = `${origin}/api/og?title=${encodeURIComponent(
       data.title
-    )}&img=${encodeURIComponent(data.image)}`;
+    )}&date=${encodeURIComponent(data.date)}&location=${encodeURIComponent(
+      data.location
+    )}`;
     setOgImageUrl(url);
   }, [data, id]);
 
-  if (!data && !error)
+  if (!data && !error) {
     return <div className="p-10 text-center">Loading...</div>;
+  }
 
-  if (error === "NOT_FOUND")
+  if (error === "NOT_FOUND") {
     return (
       <div className="p-10 text-center text-red-500">
         Data tidak ditemukan!
@@ -61,26 +63,29 @@ export default function DetailKegiatan() {
         </button>
       </div>
     );
+  }
 
-  if (error === "ERROR")
+  if (error === "ERROR") {
     return (
       <div className="p-10 text-center text-red-500">
         Terjadi kesalahan saat mengambil data
       </div>
     );
+  }
 
-  // Text WA untuk share
+  // WhatsApp share text
   const shareText = `
 📌 *${data.title}*
 
-📅 Tanggal: ${data.date}
-📍 Lokasi: ${data.location}
+📅 Tanggal : ${data.date}
+
+📍 Lokasi : ${data.location}
 
 ${data.description}
 
-Klik untuk detail & gambar:
+Klik untuk detail:
 ${window.location.origin}/detail/${id}
-`.trim();
+  `.trim();
 
   const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
     shareText
@@ -88,7 +93,7 @@ ${window.location.origin}/detail/${id}
 
   return (
     <>
-      {/* =============== HELMET UNTUK META + OG TAGS =============== */}
+      {/* OG TAGS */}
       <Helmet>
         <title>{data.title}</title>
         <meta name="description" content={data.description} />
@@ -102,7 +107,6 @@ ${window.location.origin}/detail/${id}
           content={`${window.location.origin}/detail/${id}`}
         />
       </Helmet>
-      {/* =========================================================== */}
 
       <div className="min-h-screen p-10 bg-gray-100 text-gray-900">
         <button
@@ -128,9 +132,14 @@ ${window.location.origin}/detail/${id}
           )}
 
           <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
-          <p className="text-sm text-gray-500 mb-2">
-            📅 {data.date} • 📍 {data.location}
+
+          {/* Jarak antar elemen tanggal & lokasi */}
+          <p className="text-sm text-gray-600 mb-5">
+            <span className="font-medium">Tanggal:</span> {data.date}
+            <br />
+            <span className="font-medium">Lokasi:</span> {data.location}
           </p>
+
           <p className="text-lg leading-relaxed mb-6">{data.description}</p>
 
           <a
