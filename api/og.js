@@ -1,16 +1,13 @@
-/** @jsxImportSource react */
 import { ImageResponse } from "@vercel/og";
 
 export const config = {
   runtime: "edge",
 };
 
-export default async function handler(req) {
+export default function handler(req) {
   const { searchParams } = new URL(req.url);
-
-  const title = searchParams.get("title") || "Kegiatan OSIS";
-  const date = searchParams.get("date") || "-";
-  const location = searchParams.get("location") || "-";
+  const title = searchParams.get("title") || "Kegiatan";
+  const img = searchParams.get("img") || "";
 
   return new ImageResponse(
     (
@@ -18,31 +15,27 @@ export default async function handler(req) {
         style={{
           width: "1200px",
           height: "630px",
+          background: "#f5f5f5",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "60px",
-          background: "#0b3d2e",
-          color: "white",
-          fontFamily: "Arial",
+          padding: "40px",
+          fontSize: 48,
         }}
       >
-        <h1 style={{ fontSize: 60, fontWeight: 700 }}>{title}</h1>
+        {img ? (
+          <img
+            src={img}
+            style={{
+              width: "100%",
+              height: "70%",
+              objectFit: "cover",
+              borderRadius: "20px",
+            }}
+          />
+        ) : null}
 
-        <p style={{ fontSize: 36, marginTop: 30 }}>📅 {date}</p>
-        <p style={{ fontSize: 36 }}>📍 {location}</p>
-
-        <p
-          style={{
-            position: "absolute",
-            bottom: 40,
-            right: 50,
-            opacity: 0.35,
-            fontSize: 28,
-          }}
-        >
-          OSIS SMK Yuppentek 1
-        </p>
+        <div style={{ marginTop: "30px", fontWeight: "bold" }}>{title}</div>
       </div>
     ),
     {

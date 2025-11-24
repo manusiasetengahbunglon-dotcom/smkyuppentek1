@@ -169,24 +169,20 @@ export default function Dashboard() {
   // 🔹 SHARE WHATSAPP FIX GAMBAR
   // -----------------------------
 const shareToWhatsApp = (item) => {
-  const detailUrl = `${window.location.origin}/detail/${item.id}`;
 
-  const text = `
-📌 *${item.title}*
-
+  const text =
+`📌 *${item.title}*
 📅 Tanggal: ${item.date || "-"}
 📍 Lokasi: ${item.location || "-"}
 
 ${item.description}
 
-Klik untuk lihat gambar & detail:
-${detailUrl}
-  `;
+.`; // titik pemutus biar WA tidak munculkan preview gambar
 
-  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
   window.open(waUrl, "_blank");
 };
+
 
 
   // Filter
