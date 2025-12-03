@@ -1,9 +1,13 @@
 {
   "routes": [
-    {
-      "src": "/share.html",
-      "dest": "/share.html"
-    },
+    { "src": "/share.html", "dest": "/share.html" },
+    { "src": "/favicon.ico", "dest": "/favicon.ico" },
+    { "src": "/android-chrome-192x192.png", "dest": "/android-chrome-192x192.png" },
+    { "src": "/android-chrome-512x512.png", "dest": "/android-chrome-512x512.png" },
+    { "src": "/apple-touch-icon.png", "dest": "/apple-touch-icon.png" },
+    { "src": "/favicon-16x16.png", "dest": "/favicon-16x16.png" },
+    { "src": "/favicon-32x32.png", "dest": "/favicon-32x32.png" },
+    { "src": "/logo.jpg", "dest": "/logo.jpg" },
     {
       "src": "/(.*)",
       "dest": "/index.html"
