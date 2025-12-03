@@ -179,21 +179,23 @@ export default function Dashboard() {
   /* ================================
      🔥 SHARE TO WHATSAPP — 100% WORKING
   ================================= */
-  const shareToWhatsApp = (item) => {
-    const text = 
+ const shareToWhatsApp = (item) => {
+  const text =
 `📢 *${item.title}*
-————————————————————
+📆 ${item.date}
+📍 ${item.location}
 
-📆 *${item.date}*
-📍 *${item.location}*
-
-📝 *Deskripsi:*
 ${item.description}
 
-${item.image}`; // BARIS TERAKHIR = GAMBAR → WA pasti tampil!
+🔗 Lihat Gambar:
+${item.image}`;
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-  };
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(text)}`,
+    "_blank"
+  );
+};
+
 
   const filteredItems =
     filter === "all" ? items : items.filter((i) => i.type === filter);
