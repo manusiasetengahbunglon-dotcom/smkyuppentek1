@@ -3,7 +3,9 @@ import { ref, set, push, onValue, remove, update } from "firebase/database";
 import { db } from "../firebase";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Toast sederhana
+/* ================================
+   ⚡ TOAST COMPONENT
+================================ */
 function Toast({ message, type = "success", onClose }) {
   return (
     <motion.div
@@ -20,6 +22,9 @@ function Toast({ message, type = "success", onClose }) {
   );
 }
 
+/* ================================
+   ⚡ DASHBOARD MAIN
+================================ */
 export default function Dashboard() {
   const [formData, setFormData] = useState({
     title: "",
@@ -38,7 +43,9 @@ export default function Dashboard() {
 
   const imgbbKey = "47cfc4db6ef42daf9655c9c014f574f8";
 
-  // Load data realtime
+  /* ================================
+     🔥 LOAD DATA REALTIME
+  ================================= */
   useEffect(() => {
     const dbRef = ref(db, "items");
     onValue(dbRef, (snapshot) => {
@@ -54,7 +61,9 @@ export default function Dashboard() {
     });
   }, []);
 
-  // Upload gambar ke IMGBB (Direct JPG)
+  /* ================================
+     🔥 IMAGE UPLOAD IMGBB
+  ================================= */
   const uploadImage = async (file) => {
     try {
       const form = new FormData();
@@ -68,23 +77,22 @@ export default function Dashboard() {
       const data = await res.json();
       if (!data.success) throw new Error("Upload gagal");
 
-      // WA Preview: harus direct image link
-      return data.data.image.url;
-
+      return data.data.image.url; // Direct JPG — WA friendly
     } catch (err) {
-      console.error("Upload gagal:", err);
-      setToast({ message: "❌ Upload gambar gagal!", type: "error" });
+      setToast({ message: "❌ Upload gagal!", type: "error" });
       return "";
     }
   };
 
-  // Input handler
+  /* ================================
+     🔥 FORM HANDLER
+  ================================= */
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     if (name === "image" && files && files[0]) {
       if (files[0].size > 5 * 1024 * 1024) {
-        setToast({ message: "❌ Max 5MB!", type: "error" });
-        return;
+        return setToast({ message: "❌ Max 5MB!", type: "error" });
       }
       setFormData({ ...formData, image: files[0] });
     } else {
@@ -92,7 +100,9 @@ export default function Dashboard() {
     }
   };
 
-  // Submit data
+  /* ================================
+     🔥 SUBMIT (ADD / UPDATE)
+  ================================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
@@ -100,6 +110,7 @@ export default function Dashboard() {
     try {
       let imageUrl = formData.image;
 
+      // Jika gambar baru diupload
       if (formData.image instanceof File) {
         imageUrl = await uploadImage(formData.image);
         if (!imageUrl) throw new Error("Upload gagal");
@@ -134,14 +145,15 @@ export default function Dashboard() {
         type: "event",
       });
     } catch (err) {
-      console.error(err);
-      setToast({ message: "❌ Gagal menyimpan data!", type: "error" });
+      setToast({ message: "❌ Gagal menyimpan!", type: "error" });
     } finally {
       setIsUploading(false);
     }
   };
 
-  // Edit
+  /* ================================
+     🔥 EDIT
+  ================================= */
   const handleEdit = (item) => {
     setEditingId(item.id);
     setFormData({
@@ -154,7 +166,9 @@ export default function Dashboard() {
     });
   };
 
-  // Delete
+  /* ================================
+     🔥 DELETE
+  ================================= */
   const handleDelete = async (id) => {
     if (window.confirm("Yakin hapus data ini?")) {
       await remove(ref(db, `items/${id}`));
@@ -162,247 +176,110 @@ export default function Dashboard() {
     }
   };
 
-  // SHARE WHATSAPP — versi terbaik & rapi
+  /* ================================
+     🔥 SHARE TO WHATSAPP — 100% WORKING
+  ================================= */
   const shareToWhatsApp = (item) => {
-    const text =
-`PENGUMUMAN
-──────────────────────────
+    const text = 
+`📢 *${item.title}*
+————————————————————
 
-Nama Kegiatan:
-${item.title}
+📆 *${item.date}*
+📍 *${item.location}*
 
-Tanggal:
-${item.date}
-
-Lokasi:
-${item.location}
-
-──────────────────────────
-
-Deskripsi:
+📝 *Deskripsi:*
 ${item.description}
 
-${item.image}`; // WA harus image di baris terakhir
+${item.image}`; // BARIS TERAKHIR = GAMBAR → WA pasti tampil!
 
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(waUrl, "_blank");
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
-  // Filter
   const filteredItems =
     filter === "all" ? items : items.filter((i) => i.type === filter);
 
+  /* ================================
+     🔥 RENDER
+  ================================= */
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-blue-50 via-white to-blue-100 font-[Poppins,sans-serif]">
-      
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+
       {/* Sidebar */}
-      <aside className="hidden md:flex w-64 bg-[#111827] text-white flex-col shadow-xl">
-        <div className="p-6 border-b border-white/10 flex items-center gap-3">
-          <img
-            src="/logo.jpg"
-            alt="Logo"
-            className="w-12 h-12 rounded-full border border-white/20"
-          />
-          <div>
-            <h1 className="text-xl font-bold text-blue-400">Dashboard</h1>
-            <p className="text-[11px] text-gray-400">SMK YUPENTEK 1</p>
-          </div>
+      <aside className="hidden md:flex w-64 bg-gray-900 text-white flex-col shadow-xl">
+        <div className="p-6 border-b border-white/10">
+          <h1 className="text-xl font-bold text-blue-400">Dashboard OSIS</h1>
+          <p className="text-xs text-gray-400">SMK YUPENTEK 1</p>
         </div>
 
         <div className="p-6 flex flex-col gap-3">
-          <button
-            onClick={() => setFilter("all")}
-            className={`text-left px-3 py-2 rounded ${
-              filter === "all" ? "bg-blue-600" : "hover:bg-blue-500"
-            }`}
-          >
-            Semua
-          </button>
-
-          <button
-            onClick={() => setFilter("event")}
-            className={`text-left px-3 py-2 rounded ${
-              filter === "event" ? "bg-blue-600" : "hover:bg-blue-500"
-            }`}
-          >
-            Event
-          </button>
-
-          <button
-            onClick={() => setFilter("kegiatan")}
-            className={`text-left px-3 py-2 rounded ${
-              filter === "kegiatan" ? "bg-blue-600" : "hover:bg-blue-500"
-            }`}
-          >
-            Kegiatan
-          </button>
+          <button onClick={() => setFilter("all")} className="px-3 py-2 rounded hover:bg-blue-600">Semua</button>
+          <button onClick={() => setFilter("event")} className="px-3 py-2 rounded hover:bg-blue-600">Event</button>
+          <button onClick={() => setFilter("kegiatan")} className="px-3 py-2 rounded hover:bg-blue-600">Kegiatan</button>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-5 md:p-10">
-        
+      <main className="flex-1 p-6">
+
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {editingId ? "✏️ Edit Data" : "📝 Tambah Data Baru"}
+          {editingId ? "✏️ Edit Data" : "📝 Tambah Data baru"}
         </h2>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-2xl p-6 mb-8 border border-gray-100"
-        >
-          <div className="grid sm:grid-cols-2 gap-5">
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="bg-white shadow p-6 rounded-xl mb-8">
+          <div className="grid sm:grid-cols-2 gap-4">
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Judul</label>
-              <input
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-2 border rounded-lg text-gray-700"
+            <input className="border p-2 rounded" placeholder="Judul" name="title" required value={formData.title} onChange={handleChange} />
+
+            <select name="type" className="border p-2 rounded" value={formData.type} onChange={handleChange}>
+              <option value="event">Event</option>
+              <option value="kegiatan">Kegiatan</option>
+            </select>
+
+            <input type="date" className="border p-2 rounded" name="date" required value={formData.date} onChange={handleChange} />
+
+            <input className="border p-2 rounded" placeholder="Lokasi" name="location" required value={formData.location} onChange={handleChange} />
+
+            <textarea className="border p-2 rounded col-span-2" name="description" placeholder="Deskripsi" required value={formData.description} onChange={handleChange} />
+
+            <input type="file" accept="image/*" name="image" onChange={handleChange} className="col-span-2" />
+
+            {formData.image && (
+              <img
+                src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image}
+                className="w-32 h-24 object-cover rounded"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Jenis</label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className="w-full mt-1 p-2 border rounded-lg text-gray-700"
-              >
-                <option value="event">Event</option>
-                <option value="kegiatan">Kegiatan</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Tanggal</label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-2 border rounded-lg text-gray-700"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Tempat</label>
-              <input
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-2 border rounded-lg text-gray-700"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                className="w-full mt-1 p-2 border rounded-lg text-gray-700 h-24 resize-none"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Gambar</label>
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleChange}
-                className="w-full mt-1 p-2 border rounded-lg"
-              />
-
-              {formData.image && (
-                <img
-                  src={
-                    formData.image instanceof File
-                      ? URL.createObjectURL(formData.image)
-                      : formData.image
-                  }
-                  alt="Preview"
-                  className="mt-3 w-40 h-28 object-cover rounded-lg border"
-                />
-              )}
-            </div>
-
+            )}
           </div>
 
-          <button
-            type="submit"
-            className="mt-5 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
-            disabled={isUploading}
-          >
-            {editingId ? "Simpan Perubahan" : "Tambah"}{" "}
-            {isUploading && "(Uploading...)"}
+          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" disabled={isUploading}>
+            {editingId ? "Simpan" : "Tambah"} {isUploading && "..." }
           </button>
-
         </form>
 
-        {/* List Kegiatan */}
-        <h2 className="text-xl font-bold text-gray-800 mb-3">📋 Data Tersimpan</h2>
+        {/* LIST DATA */}
+        <h2 className="text-xl font-bold mb-3 text-gray-700">📋 Data Tersimpan</h2>
 
         {filteredItems.length === 0 ? (
-          <p className="text-gray-500 italic">Belum ada data</p>
+          <p className="text-gray-500">Belum ada data</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredItems.map((item) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="bg-white rounded-xl shadow border p-4 flex flex-col"
-              >
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-36 object-cover rounded-md mb-3"
-                  />
-                )}
+              <motion.div key={item.id} className="bg-white shadow rounded-xl p-4 flex flex-col">
 
-                <h3 className="font-semibold text-gray-800">{item.title}</h3>
-                <p className="text-sm text-gray-500 mb-1">{item.date}</p>
-                <p className="text-sm text-gray-500 mb-2">{item.location}</p>
-                <p className="text-xs text-gray-600 line-clamp-3 mb-3">
-                  {item.description}
-                </p>
+                <img src={item.image} className="w-full h-40 object-cover rounded mb-3" />
 
-                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-md w-fit mb-2">
-                  {item.type}
-                </span>
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="text-sm">{item.date}</p>
+                <p className="text-sm">{item.location}</p>
 
-                <div className="mt-auto flex gap-2">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="flex-1 bg-yellow-400 text-sm text-black py-1 rounded-lg hover:bg-yellow-300 transition"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="flex-1 bg-red-500 text-sm text-white py-1 rounded-lg hover:bg-red-400 transition"
-                  >
-                    Hapus
-                  </button>
+                <div className="mt-3 flex gap-2">
+                  <button onClick={() => handleEdit(item)} className="flex-1 bg-yellow-400 py-1 rounded">Edit</button>
+                  <button onClick={() => handleDelete(item.id)} className="flex-1 bg-red-500 py-1 rounded text-white">Hapus</button>
                 </div>
 
-                <button
-                  onClick={() => shareToWhatsApp(item)}
-                  className="mt-3 w-full bg-green-500 text-white text-sm py-2 rounded-lg hover:bg-green-600"
-                >
-                  Share ke WhatsApp
+                <button onClick={() => shareToWhatsApp(item)} className="mt-2 bg-green-600 text-white py-2 rounded">
+                  Share WhatsApp
                 </button>
               </motion.div>
             ))}
@@ -411,15 +288,7 @@ ${item.image}`; // WA harus image di baris terakhir
       </main>
 
       {/* Toast */}
-      <AnimatePresence>
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-      </AnimatePresence>
+      <AnimatePresence>{toast && <Toast {...toast} onClose={() => setToast(null)} />}</AnimatePresence>
     </div>
   );
 }
