@@ -54,7 +54,7 @@ export default function Dashboard() {
     });
   }, []);
 
-  // Upload gambar ke IMGBB (Direct Link)
+  // Upload gambar ke IMGBB (Direct JPG)
   const uploadImage = async (file) => {
     try {
       const form = new FormData();
@@ -68,8 +68,9 @@ export default function Dashboard() {
       const data = await res.json();
       if (!data.success) throw new Error("Upload gagal");
 
-      // Pakai link asli supaya WhatsApp bisa preview
-      return data.data.url;
+      // WA Preview: harus direct image link
+      return data.data.image.url;
+
     } catch (err) {
       console.error("Upload gagal:", err);
       setToast({ message: "❌ Upload gambar gagal!", type: "error" });
@@ -161,19 +162,27 @@ export default function Dashboard() {
     }
   };
 
-  // ------------------------------------
-  // 🔥 SHARE WHATSAPP — DENGAN PREVIEW FOTO
-  // ------------------------------------
+  // SHARE WHATSAPP — versi terbaik & rapi
   const shareToWhatsApp = (item) => {
     const text =
-`PKM
+`PENGUMUMAN
+──────────────────────────
 
-📅 Tanggal: ${item.date || "-"}
-📍 Lokasi: ${item.location || "-"}
+Nama Kegiatan:
+${item.title}
 
+Tanggal:
+${item.date}
+
+Lokasi:
+${item.location}
+
+──────────────────────────
+
+Deskripsi:
 ${item.description}
 
-${item.image}`; // wajib baris terakhir untuk preview
+${item.image}`; // WA harus image di baris terakhir
 
     const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(waUrl, "_blank");
@@ -209,6 +218,7 @@ ${item.image}`; // wajib baris terakhir untuk preview
           >
             Semua
           </button>
+
           <button
             onClick={() => setFilter("event")}
             className={`text-left px-3 py-2 rounded ${
@@ -217,6 +227,7 @@ ${item.image}`; // wajib baris terakhir untuk preview
           >
             Event
           </button>
+
           <button
             onClick={() => setFilter("kegiatan")}
             className={`text-left px-3 py-2 rounded ${
@@ -231,16 +242,17 @@ ${item.image}`; // wajib baris terakhir untuk preview
       {/* Main */}
       <main className="flex-1 p-5 md:p-10">
         
-        {/* Form */}
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           {editingId ? "✏️ Edit Data" : "📝 Tambah Data Baru"}
         </h2>
 
+        {/* Form */}
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow-md rounded-2xl p-6 mb-8 border border-gray-100"
         >
           <div className="grid sm:grid-cols-2 gap-5">
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Judul</label>
               <input
@@ -321,6 +333,7 @@ ${item.image}`; // wajib baris terakhir untuk preview
                 />
               )}
             </div>
+
           </div>
 
           <button
@@ -331,9 +344,10 @@ ${item.image}`; // wajib baris terakhir untuk preview
             {editingId ? "Simpan Perubahan" : "Tambah"}{" "}
             {isUploading && "(Uploading...)"}
           </button>
+
         </form>
 
-        {/* List */}
+        {/* List Kegiatan */}
         <h2 className="text-xl font-bold text-gray-800 mb-3">📋 Data Tersimpan</h2>
 
         {filteredItems.length === 0 ? (
