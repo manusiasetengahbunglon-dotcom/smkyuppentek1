@@ -1,11 +1,12 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/share.html",
+      "dest": "/share.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
-  ],
-  "static": {
-    "ignore": []
-  }
+  ]
 }
