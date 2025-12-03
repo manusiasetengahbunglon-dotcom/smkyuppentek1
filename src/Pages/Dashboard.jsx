@@ -180,6 +180,8 @@ export default function Dashboard() {
      🔥 SHARE TO WHATSAPP — 100% WORKING
   ================================= */
  const shareToWhatsApp = (item) => {
+  const img = `${item.image}?v=${Date.now()}`;
+
   const text =
 `📢 *${item.title}*
 📆 ${item.date}
@@ -187,14 +189,14 @@ export default function Dashboard() {
 
 ${item.description}
 
-🔗 Lihat Gambar:
-${item.image}`;
+${img}`;
 
   window.open(
     `https://wa.me/?text=${encodeURIComponent(text)}`,
     "_blank"
   );
 };
+
 
 
   const filteredItems =
