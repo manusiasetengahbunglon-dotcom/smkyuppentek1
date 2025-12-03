@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   const imgbbKey = "47cfc4db6ef42daf9655c9c014f574f8";
 
-  // Ambil data realtime
+  // Load data realtime
   useEffect(() => {
     const dbRef = ref(db, "items");
     onValue(dbRef, (snapshot) => {
@@ -54,7 +54,7 @@ export default function Dashboard() {
     });
   }, []);
 
-  // Upload gambar ke ImgBB
+  // Upload gambar ke IMGBB (Direct Link)
   const uploadImage = async (file) => {
     try {
       const form = new FormData();
@@ -68,12 +68,8 @@ export default function Dashboard() {
       const data = await res.json();
       if (!data.success) throw new Error("Upload gagal");
 
-      const rawUrl = data.data.image.url;
-      const safeUrl = `https://images.weserv.nl/?url=${encodeURIComponent(
-        rawUrl
-      )}`;
-
-      return safeUrl;
+      // Pakai link asli supaya WhatsApp bisa preview
+      return data.data.url;
     } catch (err) {
       console.error("Upload gagal:", err);
       setToast({ message: "❌ Upload gambar gagal!", type: "error" });
@@ -86,7 +82,7 @@ export default function Dashboard() {
     const { name, value, files } = e.target;
     if (name === "image" && files && files[0]) {
       if (files[0].size > 5 * 1024 * 1024) {
-        setToast({ message: "File max 5MB!", type: "error" });
+        setToast({ message: "❌ Max 5MB!", type: "error" });
         return;
       }
       setFormData({ ...formData, image: files[0] });
@@ -144,7 +140,7 @@ export default function Dashboard() {
     }
   };
 
-  // Edit data
+  // Edit
   const handleEdit = (item) => {
     setEditingId(item.id);
     setFormData({
@@ -157,33 +153,31 @@ export default function Dashboard() {
     });
   };
 
-  // Delete data
+  // Delete
   const handleDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus data ini?")) {
+    if (window.confirm("Yakin hapus data ini?")) {
       await remove(ref(db, `items/${id}`));
       setToast({ message: "🗑️ Data berhasil dihapus!" });
     }
   };
 
-  // -----------------------------
-  // 🔹 SHARE WHATSAPP FIX GAMBAR
-  // -----------------------------
-const shareToWhatsApp = (item) => {
+  // ------------------------------------
+  // 🔥 SHARE WHATSAPP — DENGAN PREVIEW FOTO
+  // ------------------------------------
+  const shareToWhatsApp = (item) => {
+    const text =
+`PKM
 
-  const text =
-`📌 *${item.title}*
 📅 Tanggal: ${item.date || "-"}
 📍 Lokasi: ${item.location || "-"}
 
 ${item.description}
 
-.`; // titik pemutus biar WA tidak munculkan preview gambar
+${item.image}`; // wajib baris terakhir untuk preview
 
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(waUrl, "_blank");
-};
-
-
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, "_blank");
+  };
 
   // Filter
   const filteredItems =
@@ -248,9 +242,7 @@ ${item.description}
         >
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Judul
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Judul</label>
               <input
                 name="title"
                 value={formData.title}
@@ -261,9 +253,7 @@ ${item.description}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Jenis
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Jenis</label>
               <select
                 name="type"
                 value={formData.type}
@@ -276,9 +266,7 @@ ${item.description}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Tanggal
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Tanggal</label>
               <input
                 type="date"
                 name="date"
@@ -290,9 +278,7 @@ ${item.description}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Tempat
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Tempat</label>
               <input
                 name="location"
                 value={formData.location}
@@ -303,9 +289,7 @@ ${item.description}
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Deskripsi
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -316,9 +300,7 @@ ${item.description}
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Gambar
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Gambar</label>
               <input
                 type="file"
                 name="image"
@@ -347,7 +329,7 @@ ${item.description}
             disabled={isUploading}
           >
             {editingId ? "Simpan Perubahan" : "Tambah"}{" "}
-            {isUploading && "(Uploading...)"} 
+            {isUploading && "(Uploading...)"}
           </button>
         </form>
 
