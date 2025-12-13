@@ -197,9 +197,9 @@ export default function Dashboard() {
   /* ================================
      SHARE WHATSAPP
   ================================ */
-  const shareToWhatsApp = (item) => {
+ const shareToWhatsApp = (item) => {
   const text =
-`*${item.title}*
+`📌 *${item.title}*
 
 Halo teman-teman 👋  
 Kami mengundang kalian untuk mengikuti kegiatan berikut:
@@ -210,16 +210,14 @@ Lokasi: ${item.location}
 Keterangan:
 ${item.description}
 
-Yuk jangan sampai ketinggalan! 🙌🔥
+Yuk jangan sampai ketinggalan!
 
 Poster kegiatan:
 ${item.image}`;
 
-  window.open(
-    `https://wa.me/?text=${encodeURIComponent(text)}`,
-    "_blank"
-  );
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 };
+
 
 
   const filtered =
