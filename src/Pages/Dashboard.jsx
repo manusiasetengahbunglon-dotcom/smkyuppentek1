@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ================================
-   ⚡ TOAST COMPONENT
+   TOAST
 ================================ */
 function Toast({ message, type = "success", onClose }) {
   return (
@@ -12,8 +12,8 @@ function Toast({ message, type = "success", onClose }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className={`fixed top-5 right-5 px-4 py-2 rounded shadow-lg text-white z-50 ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
+      className={`fixed top-5 right-5 px-4 py-2 rounded shadow text-white z-50 ${
+        type === "success" ? "bg-green-600" : "bg-red-600"
       }`}
       onClick={onClose}
     >
@@ -23,7 +23,7 @@ function Toast({ message, type = "success", onClose }) {
 }
 
 /* ================================
-   ⚡ DASHBOARD MAIN
+   DASHBOARD
 ================================ */
 export default function Dashboard() {
   const [formData, setFormData] = useState({
@@ -31,12 +31,12 @@ export default function Dashboard() {
     description: "",
     date: "",
     location: "",
-    image: "",
+    image: null,
     type: "event",
   });
 
-  const [editingId, setEditingId] = useState(null);
   const [items, setItems] = useState([]);
+  const [editingId, setEditingId] = useState(null);
   const [toast, setToast] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -44,116 +44,138 @@ export default function Dashboard() {
   const imgbbKey = "47cfc4db6ef42daf9655c9c014f574f8";
 
   /* ================================
-     🔥 LOAD DATA REALTIME
-  ================================= */
+     AUTO CLOSE TOAST
+  ================================ */
+  useEffect(() => {
+    if (toast) {
+      const t = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toast]);
+
+  /* ================================
+     LOAD DATA REALTIME
+  ================================ */
   useEffect(() => {
     const dbRef = ref(db, "items");
-    onValue(dbRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const loaded = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
-          .reverse();
-        setItems(loaded);
-      } else {
+
+    const unsub = onValue(dbRef, (snap) => {
+      const data = snap.val();
+      if (!data) {
         setItems([]);
+        return;
       }
+
+      const arr = Object.entries(data)
+        .map(([id, val]) => ({ id, ...val }))
+        .sort((a, b) => b.timestamp - a.timestamp);
+
+      setItems(arr);
     });
+
+    return () => unsub();
   }, []);
 
   /* ================================
-     🔥 IMAGE UPLOAD IMGBB
-  ================================= */
+     UPLOAD IMAGE
+  ================================ */
   const uploadImage = async (file) => {
     try {
       const form = new FormData();
       form.append("image", file);
 
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-        method: "POST",
-        body: form,
-      });
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${imgbbKey}`,
+        { method: "POST", body: form }
+      );
 
-      const data = await res.json();
-      if (!data.success) throw new Error("Upload gagal");
+      const json = await res.json();
+      if (!json.success) throw new Error("Upload failed");
 
-      return data.data.image.url; // Direct JPG — WA friendly
+      return json.data.url;
     } catch (err) {
-      setToast({ message: "❌ Upload gagal!", type: "error" });
+      console.error(err);
+      setToast({ message: "❌ Upload gambar gagal", type: "error" });
       return "";
     }
   };
 
   /* ================================
-     🔥 FORM HANDLER
-  ================================= */
+     INPUT HANDLER
+  ================================ */
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "image" && files && files[0]) {
+    if (name === "image" && files?.[0]) {
       if (files[0].size > 5 * 1024 * 1024) {
-        return setToast({ message: "❌ Max 5MB!", type: "error" });
+        setToast({ message: "❌ Maksimal 5MB", type: "error" });
+        return;
       }
-      setFormData({ ...formData, image: files[0] });
+      setFormData((p) => ({ ...p, image: files[0] }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((p) => ({ ...p, [name]: value }));
     }
   };
 
   /* ================================
-     🔥 SUBMIT (ADD / UPDATE)
-  ================================= */
+     SUBMIT (ADD / EDIT)
+  ================================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
 
     try {
-      let imageUrl = formData.image;
+      let imageUrl = "";
 
-      // Jika gambar baru diupload
-      if (formData.image instanceof File) {
-        imageUrl = await uploadImage(formData.image);
-        if (!imageUrl) throw new Error("Upload gagal");
+      // ✔ edit tanpa upload gambar baru
+      if (editingId && typeof formData.image === "string") {
+        imageUrl = formData.image;
       }
 
-      const itemData = {
-        title: formData.title,
-        description: formData.description,
+      // ✔ upload jika file baru
+      if (formData.image instanceof File) {
+        imageUrl = await uploadImage(formData.image);
+        if (!imageUrl) throw new Error("Upload error");
+      }
+
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         date: formData.date,
-        location: formData.location,
+        location: formData.location.trim(),
         image: imageUrl,
         type: formData.type,
         timestamp: Date.now(),
       };
 
       if (editingId) {
-        await update(ref(db, `items/${editingId}`), itemData);
-        setToast({ message: "✅ Data berhasil diupdate!" });
-        setEditingId(null);
+        await update(ref(db, `items/${editingId}`), payload);
+        setToast({ message: "✅ Data berhasil diupdate" });
       } else {
-        const newRef = push(ref(db, "items"));
-        await set(newRef, itemData);
-        setToast({ message: "✅ Data berhasil ditambahkan!" });
+        await set(push(ref(db, "items")), payload);
+        setToast({ message: "✅ Data berhasil ditambahkan" });
       }
 
+      setEditingId(null);
       setFormData({
         title: "",
         description: "",
         date: "",
         location: "",
-        image: "",
+        image: null,
         type: "event",
       });
     } catch (err) {
-      setToast({ message: "❌ Gagal menyimpan!", type: "error" });
+      console.error(err);
+      setToast({ message: "❌ Gagal menyimpan data", type: "error" });
     } finally {
       setIsUploading(false);
     }
   };
 
   /* ================================
-     🔥 EDIT
-  ================================= */
+     EDIT & DELETE
+  ================================ */
   const handleEdit = (item) => {
     setEditingId(item.id);
     setFormData({
@@ -166,131 +188,92 @@ export default function Dashboard() {
     });
   };
 
-  /* ================================
-     🔥 DELETE
-  ================================= */
   const handleDelete = async (id) => {
-    if (window.confirm("Yakin hapus data ini?")) {
-      await remove(ref(db, `items/${id}`));
-      setToast({ message: "🗑️ Data berhasil dihapus!" });
-    }
+    if (!window.confirm("Yakin hapus data?")) return;
+    await remove(ref(db, `items/${id}`));
+    setToast({ message: "🗑️ Data dihapus" });
   };
 
   /* ================================
-     🔥 SHARE TO WHATSAPP — 100% WORKING
-  ================================= */
- const shareToWhatsApp = (item) => {
-  const text = `
-📢 *${item.title}*
+     SHARE WHATSAPP
+  ================================ */
+  const shareToWhatsApp = (item) => {
+    const text =
+`📢 *${item.title}*
 📆 ${item.date}
 📍 ${item.location}
 
 📝 ${item.description}
 
-🔗 Lihat gambar:
-${item.image}
-`;
+📷 ${item.image}`;
 
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-};
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(text)}`,
+      "_blank"
+    );
+  };
 
-
-
-
-  const filteredItems =
+  const filtered =
     filter === "all" ? items : items.filter((i) => i.type === filter);
 
   /* ================================
-     🔥 RENDER
-  ================================= */
+     RENDER
+  ================================ */
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-100">
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        {editingId ? "✏️ Edit Data" : "📝 Tambah Data"}
+      </h1>
 
-      {/* Sidebar */}
-      <aside className="hidden md:flex w-64 bg-gray-900 text-white flex-col shadow-xl">
-        <div className="p-6 border-b border-white/10">
-          <h1 className="text-xl font-bold text-blue-400">Dashboard OSIS</h1>
-          <p className="text-xs text-gray-400">SMK YUPENTEK 1</p>
+      {/* FORM */}
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-6">
+        <div className="grid md:grid-cols-2 gap-4">
+          <input className="border p-2 rounded" name="title" placeholder="Judul" required value={formData.title} onChange={handleChange} />
+          <select className="border p-2 rounded" name="type" value={formData.type} onChange={handleChange}>
+            <option value="event">Event</option>
+            <option value="kegiatan">Kegiatan</option>
+          </select>
+          <input type="date" className="border p-2 rounded" name="date" required value={formData.date} onChange={handleChange} />
+          <input className="border p-2 rounded" name="location" placeholder="Lokasi" required value={formData.location} onChange={handleChange} />
+          <textarea className="border p-2 rounded md:col-span-2" name="description" placeholder="Deskripsi" required value={formData.description} onChange={handleChange} />
+          <input type="file" name="image" accept="image/*" />
         </div>
 
-        <div className="p-6 flex flex-col gap-3">
-          <button onClick={() => setFilter("all")} className="px-3 py-2 rounded hover:bg-blue-600">Semua</button>
-          <button onClick={() => setFilter("event")} className="px-3 py-2 rounded hover:bg-blue-600">Event</button>
-          <button onClick={() => setFilter("kegiatan")} className="px-3 py-2 rounded hover:bg-blue-600">Kegiatan</button>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main className="flex-1 p-6">
-
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {editingId ? "✏️ Edit Data" : "📝 Tambah Data baru"}
-        </h2>
-
-        {/* FORM */}
-        <form onSubmit={handleSubmit} className="bg-white shadow p-6 rounded-xl mb-8">
-          <div className="grid sm:grid-cols-2 gap-4">
-
-            <input className="border p-2 rounded" placeholder="Judul" name="title" required value={formData.title} onChange={handleChange} />
-
-            <select name="type" className="border p-2 rounded" value={formData.type} onChange={handleChange}>
-              <option value="event">Event</option>
-              <option value="kegiatan">Kegiatan</option>
-            </select>
-
-            <input type="date" className="border p-2 rounded" name="date" required value={formData.date} onChange={handleChange} />
-
-            <input className="border p-2 rounded" placeholder="Lokasi" name="location" required value={formData.location} onChange={handleChange} />
-
-            <textarea className="border p-2 rounded col-span-2" name="description" placeholder="Deskripsi" required value={formData.description} onChange={handleChange} />
-
-            <input type="file" accept="image/*" name="image" onChange={handleChange} className="col-span-2" />
-
-            {formData.image && (
-              <img
-                src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image}
-                className="w-32 h-24 object-cover rounded"
-              />
-            )}
-          </div>
-
-          <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" disabled={isUploading}>
-            {editingId ? "Simpan" : "Tambah"} {isUploading && "..." }
-          </button>
-        </form>
-
-        {/* LIST DATA */}
-        <h2 className="text-xl font-bold mb-3 text-gray-700">📋 Data Tersimpan</h2>
-
-        {filteredItems.length === 0 ? (
-          <p className="text-gray-500">Belum ada data</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <motion.div key={item.id} className="bg-white shadow rounded-xl p-4 flex flex-col">
-
-                <img src={item.image} className="w-full h-40 object-cover rounded mb-3" />
-
-                <h3 className="font-semibold">{item.title}</h3>
-                <p className="text-sm">{item.date}</p>
-                <p className="text-sm">{item.location}</p>
-
-                <div className="mt-3 flex gap-2">
-                  <button onClick={() => handleEdit(item)} className="flex-1 bg-yellow-400 py-1 rounded">Edit</button>
-                  <button onClick={() => handleDelete(item.id)} className="flex-1 bg-red-500 py-1 rounded text-white">Hapus</button>
-                </div>
-
-                <button onClick={() => shareToWhatsApp(item)} className="mt-2 bg-green-600 text-white py-2 rounded">
-                  Share WhatsApp
-                </button>
-              </motion.div>
-            ))}
-          </div>
+        {formData.image && (
+          <img
+            src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image}
+            className="mt-3 w-32 h-24 object-cover rounded"
+          />
         )}
-      </main>
 
-      {/* Toast */}
-      <AnimatePresence>{toast && <Toast {...toast} onClose={() => setToast(null)} />}</AnimatePresence>
+        <button disabled={isUploading} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded">
+          {isUploading ? "Menyimpan..." : editingId ? "Update" : "Tambah"}
+        </button>
+      </form>
+
+      {/* LIST */}
+      <div className="grid md:grid-cols-3 gap-4">
+        {filtered.map((item) => (
+          <div key={item.id} className="bg-white p-4 rounded shadow">
+            <img src={item.image} className="h-40 w-full object-cover rounded mb-2" />
+            <h3 className="font-bold">{item.title}</h3>
+            <p className="text-sm">{item.date} • {item.location}</p>
+
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => handleEdit(item)} className="flex-1 bg-yellow-400 rounded py-1">Edit</button>
+              <button onClick={() => handleDelete(item.id)} className="flex-1 bg-red-500 text-white rounded py-1">Hapus</button>
+            </div>
+
+            <button onClick={() => shareToWhatsApp(item)} className="mt-2 bg-green-600 text-white w-full py-2 rounded">
+              Share WhatsApp
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+      </AnimatePresence>
     </div>
   );
 }
