@@ -5,6 +5,7 @@ import { Activity } from "lucide-react";
 
 export default function Kegiatan() {
   const [kegiatanList, setKegiatanList] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     const dbRef = ref(db, "items");
@@ -24,53 +25,88 @@ export default function Kegiatan() {
   return (
     <section
       id="kegiatan"
-      className="py-20 bg-gradient-to-b from-blue-50/70 via-white/90 to-blue-100/70 text-gray-900"
+      className="py-20 bg-gradient-to-b from-blue-50/70 via-white to-blue-100/70"
     >
       {/* Header */}
       <div className="text-center mb-14 px-6">
         <h2 className="text-4xl font-extrabold text-blue-700 mb-4 flex justify-center items-center gap-2">
-          <Activity size={36} className="text-blue-600" />
+          <Activity size={36} />
           Kegiatan Sekolah
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Dokumentasi berbagai kegiatan siswa dan sekolah dalam membangun
-          semangat belajar, kreativitas, dan kebersamaan.
+          Dokumentasi berbagai kegiatan sekolah yang melibatkan siswa dalam
+          pembelajaran, kreativitas, dan kebersamaan.
         </p>
       </div>
 
-      {/* Isi */}
+      {/* Content */}
       {kegiatanList.length === 0 ? (
-        <div className="flex justify-center items-center h-60">
-          <p className="text-gray-500 text-lg italic">
-            Belum ada kegiatan terbaru...
-          </p>
-        </div>
+        <p className="text-gray-500 text-center italic text-lg">
+          Belum ada kegiatan terbaru.
+        </p>
       ) : (
-        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-8 max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-8 px-6 max-w-7xl mx-auto">
           {kegiatanList.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-blue-100 hover:scale-[1.03] overflow-hidden flex flex-col"
+              className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-blue-100 flex flex-col"
             >
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-56 object-cover"
-              />
+              {/* Image */}
+              <div className="overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+
+              {/* Content */}
               <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-lg font-bold text-blue-700 mb-1">
+                {/* Judul */}
+                <h3 className="text-lg font-bold text-blue-700 mb-2 leading-snug">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-1">📅 {item.date}</p>
-                <p className="text-gray-500 text-sm mb-3">📍 {item.location}</p>
 
-                <p className="text-gray-700 text-sm flex-grow leading-relaxed line-clamp-3 mb-2">
+                {/* Info */}
+                <div className="text-sm text-gray-600 mb-3 space-y-0.5">
+                  <p>
+                    <span className="font-medium text-gray-700">
+                      Tanggal:
+                    </span>{" "}
+                    {item.date}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-700">
+                      Tempat:
+                    </span>{" "}
+                    {item.location}
+                  </p>
+                </div>
+
+                {/* Deskripsi */}
+                <p
+                  className={`text-gray-700 text-sm leading-relaxed transition-all ${
+                    expandedId === item.id ? "" : "line-clamp-3"
+                  }`}
+                >
                   {item.description}
                 </p>
 
-                <button className="mt-auto bg-blue-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-blue-700 transition">
-                  Lihat Selengkapnya
-                </button>
+                {/* Expand */}
+                {item.description.length > 120 && (
+                  <button
+                    onClick={() =>
+                      setExpandedId(
+                        expandedId === item.id ? null : item.id
+                      )
+                    }
+                    className="text-blue-600 text-xs font-medium mt-1 hover:underline self-start"
+                  >
+                    {expandedId === item.id
+                      ? "Tutup"
+                      : "Lihat selengkapnya"}
+                  </button>
+                )}
               </div>
             </div>
           ))}
