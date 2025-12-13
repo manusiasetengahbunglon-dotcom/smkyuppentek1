@@ -198,20 +198,29 @@ export default function Dashboard() {
      SHARE WHATSAPP
   ================================ */
   const shareToWhatsApp = (item) => {
-    const text =
-`📢 *${item.title}*
-📆 ${item.date}
-📍 ${item.location}
+  const text =
+`*${item.title}*
 
-📝 ${item.description}
+Halo teman-teman 👋  
+Kami mengundang kalian untuk mengikuti kegiatan berikut:
 
-📷 ${item.image}`;
+Tanggal: ${item.date}
+Lokasi: ${item.location}
 
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(text)}`,
-      "_blank"
-    );
-  };
+Keterangan:
+${item.description}
+
+Yuk jangan sampai ketinggalan! 🙌🔥
+
+Poster kegiatan:
+${item.image}`;
+
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(text)}`,
+    "_blank"
+  );
+};
+
 
   const filtered =
     filter === "all" ? items : items.filter((i) => i.type === filter);
