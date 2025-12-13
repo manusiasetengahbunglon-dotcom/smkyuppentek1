@@ -197,26 +197,35 @@ export default function Dashboard() {
   /* ================================
      SHARE WHATSAPP
   ================================ */
- const shareToWhatsApp = (item) => {
-  const text =
-`📌 *${item.title}*
+const shareToWhatsApp = (item) => {
+  const message =
+`Announcement
 
-Halo teman-teman 👋  
-Kami mengundang kalian untuk mengikuti kegiatan berikut:
+Kepada Yth.
+Siswa dan Siswi SMK YUPENTEK 1 Tangerang
 
-Tanggal: ${item.date}
-Lokasi: ${item.location}
+Dengan ini kami sampaikan informasi kegiatan sebagai berikut:
 
-Keterangan:
+Judul      : ${item.title}
+Tanggal    : ${item.date}
+Lokasi     : ${item.location}
+
+Deskripsi
 ${item.description}
 
-Yuk jangan sampai ketinggalan!
+Poster Kegiatan
+${item.image}
 
-Poster kegiatan:
-${item.image}`;
+Demikian informasi ini disampaikan. Atas perhatian dan partisipasinya,
+kami ucapkan terima kasih.`;
 
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  window.open(
+    `https://wa.me/?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
 };
+
+
 
 
 
