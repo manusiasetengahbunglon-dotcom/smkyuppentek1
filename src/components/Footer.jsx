@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.2),transparent_70%)]"></div>
 
       <div className="relative z-10 text-sm">
-        © 2025 OSIS SMK YUPENTEK 1 Tangerang. All rights reserved.
+        © 2026 OSIS SMK YUPPENTEK 1 Tangerang.
       </div>
     </footer>
   );
