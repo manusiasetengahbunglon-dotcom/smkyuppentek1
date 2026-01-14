@@ -52,7 +52,7 @@ export default function Jurusan() {
       {/* Judul */}
       <div className="relative text-center mb-14 px-6 z-10">
         <h2 className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-4">
-          Jurusan di SMK YUPENTEK 1 Tangerang
+          Jurusan di SMK YUPPENTEK 1 Tangerang
         </h2>
         <div className="w-24 h-1 bg-blue-600 mx-auto mb-4 rounded-full"></div>
         <p className="text-gray-700 max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed">
