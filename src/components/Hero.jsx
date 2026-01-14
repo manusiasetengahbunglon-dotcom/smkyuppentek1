@@ -41,7 +41,7 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center md:items-start mt-6 sm:mt-12 w-full max-w-full sm:max-w-lg md:max-w-3xl text-center md:text-left px-2 sm:px-0">
         <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold leading-snug sm:leading-snug md:leading-tight mb-4 sm:mb-6 break-words">
   <span className="bg-gradient-to-r from-blue-400 via-yellow-300 to-red-400 bg-clip-text text-transparent drop-shadow-lg">
-    SMK&nbsp;YUPENTEK&nbsp;1&nbsp;TANGERANG
+    SMK&nbsp;YUPPENTEK&nbsp;1&nbsp;TANGERANG
   </span>
 </h1>
 
