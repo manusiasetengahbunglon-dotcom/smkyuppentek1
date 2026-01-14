@@ -227,7 +227,7 @@ PENGUMUMAN
  
 Kepada Yth.
 Siswa dan Siswi
-SMK YUPENTEK 1 Tangerang
+SMK YUPPENTEK 1 Tangerang
 
 
 Kegiatan
@@ -253,7 +253,7 @@ kami ucapkan terima kasih.
 
 Hormat kami,
 
-SMK YUPENTEK 1 Tangerang
+SMK YUPPENTEK 1 Tangerang
 `;
 
   window.open(
@@ -293,7 +293,7 @@ SMK YUPENTEK 1 Tangerang
 
         {/* KANAN: IDENTITAS */}
         <div className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-lg">
-          SMK YUPENTEK 1 Tangerang
+          SMK YUPPENTEK 1 Tangerang
         </div>
       </div>
       {/* =============== END HEADER =============== */}
