@@ -37,7 +37,7 @@ export default function Navbar() {
         >
           <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
           <h1 className="text-yellow-400 font-bold text-lg">
-            SMK YUPENTEK 1 TANGERANG
+            SMK YUPPENTEK 1 TANGERANG
           </h1>
         </div>
 
