@@ -69,7 +69,7 @@ export default function Login() {
         </h2>
 
         <p className="text-gray-600 mb-8 text-sm font-medium">
-          SMK YUPENTEK 1 TANGERANG
+          SMK YUPPENTEK 1 TANGERANG
         </p>
 
         <form onSubmit={handleLogin}>
@@ -101,7 +101,7 @@ export default function Login() {
         </form>
 
         <p className="mt-8 text-gray-500 text-xs">
-          © 2025 OSIS SMK YUPENTEK 1 TANGERANG
+          © 2025 OSIS SMK YUPPENTEK 1 TANGERANG
         </p>
       </div>
     </div>

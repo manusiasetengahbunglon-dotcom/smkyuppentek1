@@ -222,9 +222,9 @@ export default function Dashboard() {
 
 const shareToWhatsApp = (item) => {
   const message = `
-   PENGUMUMAN
- ===============
 
+PENGUMUMAN
+ 
 Kepada Yth.
 Siswa dan Siswi
 SMK YUPENTEK 1 Tangerang
@@ -267,27 +267,112 @@ SMK YUPENTEK 1 Tangerang
      RENDER
   ================================ */
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        {editingId ? "Edit Data" : "Tambah Data"}
-      </h1>
+  <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-6">
+    <div className="max-w-7xl mx-auto">
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-6">
-        <div className="grid md:grid-cols-2 gap-4">
-          <input className="border p-2 rounded" name="title" placeholder="Judul" required value={formData.title} onChange={handleChange} />
+      {/* ================= HEADER ================= */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        
+        {/* KIRI: LOGO + TITLE */}
+        <div className="flex items-center gap-4">
+          <img
+            src="/logo.jpg"
+            alt="Logo Sekolah"
+            className="w-14 h-14 object-contain"
+          />
+          
+          <div>
+            <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 leading-tight">
+              {editingId ? "Edit Data Kegiatan" : "Event Management System"}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Pengelolaan Kegiatan OSIS
+            </p>
+          </div>
+        </div>
 
-          <select className="border p-2 rounded" name="type" value={formData.type} onChange={handleChange}>
-            <option value="event">Event</option>
-            <option value="kegiatan">Kegiatan</option>
-          </select>
+        {/* KANAN: IDENTITAS */}
+        <div className="text-sm text-gray-600 bg-gray-100 px-4 py-2 rounded-lg">
+          SMK YUPENTEK 1 Tangerang
+        </div>
+      </div>
+      {/* =============== END HEADER =============== */}
 
-          <input type="date" className="border p-2 rounded" name="date" required value={formData.date} onChange={handleChange} />
+      {/* ================= FORM ================= */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl shadow-md p-6 mb-10"
+      >
+        <div className="grid md:grid-cols-2 gap-5">
+          <div>
+            <label className="text-sm text-gray-600">Judul</label>
+            <input
+              className="w-full mt-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              name="title"
+              required
+              value={formData.title}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input className="border p-2 rounded" name="location" placeholder="Lokasi" required value={formData.location} onChange={handleChange} />
+          <div>
+            <label className="text-sm text-gray-600">Jenis</label>
+            <select
+              className="w-full mt-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+            >
+              <option value="event">Event</option>
+              <option value="kegiatan">Kegiatan</option>
+            </select>
+          </div>
 
-          <textarea className="border p-2 rounded md:col-span-2" name="description" placeholder="Deskripsi" required value={formData.description} onChange={handleChange} />
+          <div>
+            <label className="text-sm text-gray-600">Tanggal</label>
+            <input
+              type="date"
+              className="w-full mt-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              name="date"
+              required
+              value={formData.date}
+              onChange={handleChange}
+            />
+          </div>
 
-          <input type="file" name="image" accept="image/*" onChange={handleChange} />
+          <div>
+            <label className="text-sm text-gray-600">Lokasi</label>
+            <input
+              className="w-full mt-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              name="location"
+              required
+              value={formData.location}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-sm text-gray-600">Deskripsi</label>
+            <textarea
+              rows="4"
+              className="w-full mt-1 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              name="description"
+              required
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-sm text-gray-600">Poster</label>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleChange}
+              className="mt-2"
+            />
+          </div>
         </div>
 
         {formData.image && (
@@ -297,52 +382,83 @@ SMK YUPENTEK 1 Tangerang
                 ? URL.createObjectURL(formData.image)
                 : formData.image
             }
-            className="mt-3 w-40 h-28 object-cover rounded"
+            className="mt-4 w-48 h-32 object-cover rounded-lg border"
             alt="preview"
           />
         )}
 
-        <button disabled={isUploading} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-60">
-          {isUploading ? "Menyimpan..." : editingId ? "Update" : "Tambah"}
+        <button
+          disabled={isUploading}
+          className="mt-6 bg-blue-600 hover:bg-blue-700 transition text-white px-8 py-2 rounded-lg disabled:opacity-60"
+        >
+          {isUploading
+            ? "Menyimpan..."
+            : editingId
+            ? "Update Data"
+            : "Tambah Data"}
         </button>
       </form>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      {/* ================= LIST ================= */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
-          <div key={item.id} className="bg-white p-4 rounded shadow">
-            <img src={item.image} className="h-40 w-full object-cover rounded mb-2" alt={item.title} />
-            <h3 className="font-bold">{item.title}</h3>
-            <p className="text-sm">{item.date} • {item.location}</p>
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+          >
+            <img
+              src={item.image}
+              className="h-44 w-full object-cover"
+              alt={item.title}
+            />
 
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => {
-                  setEditingId(item.id);
-                  setFormData(item);
-                }}
-                className="flex-1 bg-yellow-400 rounded py-1"
-              >
-                Edit
-              </button>
+            <div className="p-4">
+              <h3 className="font-semibold text-lg text-gray-800">
+                {item.title}
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {item.date} • {item.location}
+              </p>
+
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => {
+                    setEditingId(item.id);
+                    setFormData(item);
+                  }}
+                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 transition rounded-md py-1 text-sm"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => remove(ref(db, `items/${item.id}`))}
+                  className="flex-1 bg-red-500 hover:bg-red-600 transition text-white rounded-md py-1 text-sm"
+                >
+                  Hapus
+                </button>
+              </div>
 
               <button
-                onClick={() => remove(ref(db, `items/${item.id}`))}
-                className="flex-1 bg-red-500 text-white rounded py-1"
+                onClick={() => shareToWhatsApp(item)}
+                className="mt-3 bg-green-600 hover:bg-green-700 transition text-white w-full py-2 rounded-md text-sm"
               >
-                Hapus
+                Share WhatsApp
               </button>
             </div>
-
-            <button onClick={() => shareToWhatsApp(item)} className="mt-2 bg-green-600 text-white w-full py-2 rounded">
-              Share WhatsApp
-            </button>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <AnimatePresence>
         {toast && <Toast {...toast} onClose={() => setToast(null)} />}
       </AnimatePresence>
+
     </div>
-  );
+  </div>
+);
 }
+
+
